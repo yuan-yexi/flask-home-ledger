@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify
-from flask_restful import Api
 import pandas as pd
 import numpy as np
 import joblib
@@ -8,8 +7,6 @@ import requests
 import os
 
 app = Flask(__name__)
-api = Api(app)
-basedir = os.path.abspath(os.path.dirname(__file__))
 
 _resale_price = joblib.load(filename='xgboost_regression')
 
