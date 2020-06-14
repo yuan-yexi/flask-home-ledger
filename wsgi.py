@@ -1,25 +1,35 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
+
 import pandas as pd
 import numpy as np
 import joblib
+
 import json
 import requests
 import os
 
 app = Flask(__name__)
+CORS(app)
 
 _resale_price = joblib.load(filename='xgboost_regression')
 
-# Get all products
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+
+# XGBoost Model
 @app.route('/predict', methods=['POST'])
 def predict_price():
+    print(request.json)
     flat_type = request.json['flat_type']
     storey_range = request.json['storey_range']
     floor_area_sqm = request.json['floor_area_sqm']
     street_name = request.json['street_name']
     block = request.json['block']
+
+    print(str(flat_type) + " | " + str(storey_range) + " | " + str(floor_area_sqm) + " | " + str(street_name) + " | " + str(block))
     
     address = block + ' ' + street_name
+    print(address)
 
     query_string_lat_lng = 'https://developers.onemap.sg/commonapi/search?searchVal='+str(address)+'&returnGeom=Y&getAddrDetails=Y'
     resp_lease = requests.get(query_string_lat_lng)
@@ -43,6 +53,7 @@ def predict_price():
 
     results = _resale_price.predict(input_data)
     pred = results.tolist()
+    print(pred)
     return jsonify(pred)
 
 if __name__ == '__main__':

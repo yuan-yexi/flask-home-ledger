@@ -38,7 +38,8 @@ class CategoricalEncoder(BaseEstimator, TransformerMixin):
                 X['flat_type_mapped'] = X[feature].map(lambda x: flat_type_map[x])
             
             elif feature == 'storey_range':
-                X['floor_mean'] = X[feature].apply(lambda x: self.split_mean(x))
+                if not isinstance(X[feature], int):
+                    X['floor_mean'] = X[feature].apply(lambda x: self.split_mean(x))
             
             return X
 
